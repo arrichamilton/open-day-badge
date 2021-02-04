@@ -5,4 +5,4 @@ Further testing REQUIRED to ensure functionality. Available on [Google Drive](ht
 
 
 # Useful links:
--PiShrink Image Resizer [github](https://github.com/Drewsif/PiShrink)
+- PiShrink Image Resizer [github](https://github.com/Drewsif/PiShrink)
