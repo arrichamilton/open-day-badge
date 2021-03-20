@@ -6,6 +6,8 @@ Further testing REQUIRED to ensure complete functionality.
 
 # Scripts
 - mac_handler.py - converts gateway IP to determine MAC address
+
+# Config/Boot Files
 - config.txt - boot config file for retropie /boot/config.txt
 - fbtft.conf - TFT framebuffer configuration file /etc/modprobe.d/fbtft.conf  
 - rc.local - Scripts run when device booted /etc/rc.local
@@ -14,3 +16,4 @@ Further testing REQUIRED to ensure complete functionality.
 
 # Useful links:
 - PiShrink Image Resizer [github](https://github.com/Drewsif/PiShrink)
+- 128x160 GU Logo [imgur] (https://i.imgur.com/65o2n7P.png)
