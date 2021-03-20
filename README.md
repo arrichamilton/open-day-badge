@@ -3,7 +3,7 @@
 Retropie configuration files for ST7735R
 Further testing REQUIRED to ensure complete functionality. 
 
-#Scripts
+# Scripts
 - MAC Handler - converts gateway IP to determine MAC address
 
 # Useful links:
