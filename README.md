@@ -20,4 +20,4 @@ Further testing REQUIRED to ensure complete functionality.
 
 # Useful links:
 - PiShrink Image Resizer [github](https://github.com/Drewsif/PiShrink)
-- 128x160 GU Logo [imgur] (https://i.imgur.com/65o2n7P.png)
+- 128x160 GU Logo [imgur](https://i.imgur.com/65o2n7P.png)
