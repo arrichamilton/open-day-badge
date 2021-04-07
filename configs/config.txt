@@ -38,5 +38,5 @@ hdmi_force_hotplug=1
 hdmi_cvt=128 160 60 4 0 0 0
 hdmi_group=2
 hdmi_mode=87
-display_rotate=3
+display_rotate=1
 
