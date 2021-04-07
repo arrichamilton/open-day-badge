@@ -7,11 +7,28 @@ Created on Thu Apr  1 00:27:55 2021
 
 import os
 from os import path
+import subprocess
 from getmac import get_mac_address as gmc
 import netifaces as nf
+import sys
+import time
+import qrcode
+import pygame
+from PIL import Image
 import board #Adafruit Blinka
 import digitalio #RPi GPIO
-import time #optional include
+
+def killPid():
+    subprocess = subprocess.Popen(['ps', '-A'], stdout=subprocess.PIPE)
+    output, error = subprocess.communicate()
+    target_process = "fbcp"
+    for line in output.splitlines():
+        if target_process in str(line):
+            pid = int(line.split(None, 1)[0])
+            os.kill(pid, 9)
+            
+def openPID():
+    subprocess.Popen([r'fbcp'])
 
 def info_conv(place):
     information = {
@@ -71,7 +88,26 @@ def freeDisk():
         
 def getMAC():
     return gmc(ip=list(nf.gateways()['default'].values())[0][0])
-        
+
+def qrGen(data):
+    qr = qrcode.QRCode(version=1,box_size=10,border=5) #QR class
+    qr.add_data(data) #Configurable QR text
+    qr.make(fit=True)
+    img = qr.make_image(fill='black', back_color='white')
+    img.save('qr_demo.png')
+    im = Image.open('qr_demo.png')
+    im_resized=im.resize((128,160)) #resize to display
+    im_resized.save('qr_demo.png') 
+    
+    
+def qrDisp():
+    os.environ["SDL_FBDEV"] = "/dev/fb1"
+    os.environ['SDL_VIDEODRIVER']="fbcon"
+    
+    qrCode = pygame.image.load('qr_demo.png')
+    screen.fill((0,0,0))
+    screen.blit(qrCode, (0,0))
+    
 def locationTiming(i):
     loc_int.append(location_conv(getMAC()))
     if loc_int[i] != loc_int[i - 1]:
@@ -86,6 +122,7 @@ def locationTiming(i):
     else:
         print("same location")
     
+    #text file save + self test
     if path.exists("C://Users/Arric/Documents/test_loc.txt") == True:
         with open("C://Users/Arric/Documents/test_loc.txt", "a") as locSave:
             locSave.write(loc[-1])
@@ -98,9 +135,14 @@ def locationTiming(i):
     #ram = freeRAM() #RAM usage
     
 #Raspberry Pi GPIO setup 
-button = digitalio.DigitalInOut(board.D18)
+button = digitalio.DigitalInOut(board.D5) #START button
 button.direction = digitalio.Direction.INPUT
 button.pull = digitalio.Pull.DOWN
+
+global screen
+pygame.init()
+size = width,height = 128,160
+screen = pygame.display.set_mode(size)
 
 loc_int = []
 loc = []
@@ -110,6 +152,10 @@ i=0
 
 for k in range(0,10,1):
     locationTiming(i)
+    qrDisp()
+    pygame.display.flip()
+    time.sleep(10)
+    
 
     
 
