@@ -17,6 +17,7 @@ Further testing REQUIRED to ensure complete functionality.
 - rc.local - Scripts run when device booted /etc/rc.local
 - wpa_supplicant.conf - Copy to /boot/ to setup Wi-Fi
 - ssh - Copy to /boot/ to enable SSH when flashing an image
+- retrogame.cfg - Copy to /boot/ to configure GPIO as key presses
 
 # Useful links:
 - PiShrink Image Resizer [github](https://github.com/Drewsif/PiShrink)
