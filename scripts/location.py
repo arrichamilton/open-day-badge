@@ -5,8 +5,7 @@ Created on Thu Apr  1 00:27:55 2021
 @author: TDP4 Team 3 2021
 
 To-Do List:
-    1) Text input
-    2) Process check against emulation station
+    1) Process check against emulation station
 """
 import os
 from os import path
@@ -22,10 +21,10 @@ import digitalio #RPi GPIO
 #GPIO setup 
 startB = digitalio.DigitalInOut(board.D5) #START button
 startB.direction = digitalio.Direction.INPUT
-startB.pull = digitalio.Pull.DOWN
+startB.pull = digitalio.Pull.UP
 selB = digitalio.DigitalInOut(board.D23) #SEL button
 selB.direction = digitalio.Direction.INPUT
-selB.pull = digitalio.Pull.DOWN
+selB.pull = digitalio.Pull.UP
 
 #display drivers
 os.environ["SDL_FBDEV"] = "/dev/fb1"
@@ -158,7 +157,7 @@ def locationInput(loc,loc_int,i):
             
             strt = startB.value
             sel = selB.value
-            while True !=(sel or strt):
+            while True =(sel or strt):
                 if startB.value:
                     print("START, Printing QR")
                     x=info_conv(loc[-1])
