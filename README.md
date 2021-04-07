@@ -5,11 +5,11 @@ Retropie configuration files for ST7735R
 Further testing REQUIRED to ensure complete functionality. 
 
 # Scripts
-- mac_handler.py - converts gateway IP to determine MAC address
-- location_detector.py - matches MAC to building location_detector
-- location_handler.py - combines mac handler and location detector scripts
+- location.py - The main script, combines all others
+- get_mac.py - converts gateway IP to determine MAC address
+- location_dict.py - matches MAC to building location
 - pid_kill.py - kills a PID on the RPi
-- qr_gen.py - generates, resizes, and outputs a QR code to the RPi
+- qr_gen.py - generates, resizes, and outputs a QR image
 
 # Config/Boot Files
 - config.txt - boot config file for retropie /boot/config.txt

@@ -12,8 +12,9 @@ import qrcode
 import pygame
 from PIL import Image
 
+x='https://en.wikipedia.org/wiki/University_of_Glasgow'
 qr = qrcode.QRCode(version=1,box_size=10,border=5) #QR class
-qr.add_data("123test") #Configurable QR text
+qr.add_data(x) #Configurable QR text
 qr.make(fit=True)
 img = qr.make_image(fill='black', back_color='white')
 img.save('qr_demo.png')

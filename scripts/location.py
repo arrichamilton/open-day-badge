@@ -3,14 +3,15 @@
 Created on Thu Apr  1 00:27:55 2021
 
 @author: TDP4 Team 3 2021
-"""
 
+To-Do List:
+    1) Text input
+    2) Process check against emulation station
+"""
 import os
 from os import path
-import subprocess
 from getmac import get_mac_address as gmc
 import netifaces as nf
-import sys
 import time
 import qrcode
 import pygame
@@ -18,16 +19,31 @@ from PIL import Image
 import board #Adafruit Blinka
 import digitalio #RPi GPIO
 
+#GPIO setup 
+startB = digitalio.DigitalInOut(board.D5) #START button
+startB.direction = digitalio.Direction.INPUT
+startB.pull = digitalio.Pull.DOWN
+selB = digitalio.DigitalInOut(board.D23) #SEL button
+selB.direction = digitalio.Direction.INPUT
+selB.pull = digitalio.Pull.DOWN
+
+#display drivers
+os.environ["SDL_FBDEV"] = "/dev/fb1"
+os.environ['SDL_VIDEODRIVER']="fbcon"
+
 def killPid():
+    import subprocess
     subprocess = subprocess.Popen(['ps', '-A'], stdout=subprocess.PIPE)
     output, error = subprocess.communicate()
+    
     target_process = "fbcp"
     for line in output.splitlines():
         if target_process in str(line):
             pid = int(line.split(None, 1)[0])
             os.kill(pid, 9)
-            
+
 def openPID():
+    import subprocess
     subprocess.Popen([r'fbcp'])
 
 def info_conv(place):
@@ -56,14 +72,14 @@ def location_conv(name):
         '00:2a:10:93:bf:f1': 'Queen Margaret Union ',
         '70:79:b3:2d:6f:a1': 'East ',
         'b8:62:1f:ac:60:81': 'West ',
-        '80:72:15:ef:aa:21': 'Self Test '      
+        '80:72:15:ef:aa:21': 'Self Test'
     }
     return address.get(name, 'User Travelling ')
-                                           
+
 def CPUtemp():
     res = os.popen('vcgencmd measure_temp').readline()
     return(res.replace("temp=","").replace("'C\n",""))
-                                                               
+
 def freeRAM():
     p = os.popen('free')
     i = 0
@@ -72,11 +88,11 @@ def freeRAM():
         line = p.readline()
         if i==2:
             return(int(line.split()[3])/1024)
-                                    
+            
 def CPUuse():
     return(str(os.popen("top -n1 | awk '/Cpu\(s\):/ {print $2}'").readline().strip(\
 )))
-                                         
+
 def freeDisk():
     p = os.popen("df -h /")
     i = 0
@@ -85,7 +101,7 @@ def freeDisk():
         line = p.readline()
         if i==2:
             return(int(line.split()[3]))
-        
+
 def getMAC():
     return gmc(ip=list(nf.gateways()['default'].values())[0][0])
 
@@ -94,68 +110,117 @@ def qrGen(data):
     qr.add_data(data) #Configurable QR text
     qr.make(fit=True)
     img = qr.make_image(fill='black', back_color='white')
-    img.save('qr_demo.png')
-    im = Image.open('qr_demo.png')
+    img.save('qr.png')
+    im = Image.open('qr.png')
     im_resized=im.resize((128,160)) #resize to display
-    im_resized.save('qr_demo.png') 
-    
-    
+    im_resized.save('qr.png') 
+
 def qrDisp():
-    os.environ["SDL_FBDEV"] = "/dev/fb1"
-    os.environ['SDL_VIDEODRIVER']="fbcon"
-    
-    qrCode = pygame.image.load('qr_demo.png')
+    qrCode = pygame.image.load('qr.png')
     screen.fill((0,0,0))
     screen.blit(qrCode, (0,0))
     
-def locationTiming(i):
+def displaytext(text,size,line,color,clearscreen):
+   if clearscreen:
+       screen.fill((1,53,99))
+
+   font = pygame.font.Font(None,size)
+   text = font.render(text,0,color)
+   rotated = pygame.transform.rotate(text,90)
+   textpos = rotated.get_rect()
+   textpos.centery = 80
+   if line == 1:
+        textpos.centerx = 99
+        screen.blit(rotated,textpos)
+   elif line == 2:
+        textpos.centerx = 61
+        screen.blit(rotated,textpos)
+   elif line == 3:
+        textpos.centerx = 40
+        screen.blit(rotated,textpos)
+
+def locationInput(loc,loc_int,i):
     loc_int.append(location_conv(getMAC()))
-    if loc_int[i] != loc_int[i - 1]:
+    """#TEST FUNCTION
+    if i == 4:
+        loc_int[i] = 'East '
+    """
+    if loc_int[i] != loc_int[i-1]:
         loc.append(loc_int[i])
         if loc[-1] == 'User Travelling':
-            z = 1
+            z=1
         else:
-            print('Do you like this place?')
-            if button.value == 'Yes':
-                info_conv(loc[-1])
-                print(info_conv(loc[-1]))
+            killPid()
+            displaytext("Like to know more",20,3,(255,255,255),True)
+            displaytext("about this location?",20,2,(255,255,255),False)
+            displaytext("START (Y) / SEL (N)",20,1,(255,255,255),False)
+            pygame.display.flip()
+            
+            strt = startB.value
+            sel = selB.value
+            while True !=(sel or strt):
+                if startB.value:
+                    print("START, Printing QR")
+                    x=info_conv(loc[-1])
+                    qrGen(x)
+                    qrDisp()
+                    pygame.display.flip()
+                    time.sleep(10)
+                    load=True
+                    break
+                    
+                elif selB.value:
+                    print("SEL")
+                    load=True
+                    break
+                else: 
+                    time.sleep(2)
+                    print("Waiting")
+                    
     else:
-        print("same location")
+        load = False
+        openPID()
+        print("Same Location")
+    
+    #Loading screen
+    if load:
+        loading="Loading"
+        for p in range(3):
+            loading=loading+"."
+            displaytext(loading,30,2,(100,100,255),True)
+            pygame.display.flip()
+            time.sleep(0.5)
     
     #text file save + self test
     if path.exists("C://Users/Arric/Documents/test_loc.txt") == True:
         with open("C://Users/Arric/Documents/test_loc.txt", "a") as locSave:
             locSave.write(loc[-1])
     else:
-         with open("test_loc.txt", "a") as locSave:
+         with open("loc.txt", "a") as locSave:
              locSave.write(loc[-1])
-    i+=1
     #temp = CPUtemp() #optional CPU temp
     #usage = CPUuse() #CPU usage
     #ram = freeRAM() #RAM usage
+
+def main():
+    global screen
+    pygame.init()
+    pygame.mouse.set_cursor((8,8),(0,0),(0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0)) #hides cursor
+    size = width,height = 128,160
+    screen = pygame.display.set_mode(size)
     
-#Raspberry Pi GPIO setup 
-button = digitalio.DigitalInOut(board.D5) #START button
-button.direction = digitalio.Direction.INPUT
-button.pull = digitalio.Pull.DOWN
-
-global screen
-pygame.init()
-size = width,height = 128,160
-screen = pygame.display.set_mode(size)
-
-loc_int = []
-loc = []
-loc_int.append(location_conv(getMAC())) #start locations
-loc.append(location_conv(getMAC())) 
-i=0
-
-for k in range(0,10,1):
-    locationTiming(i)
-    qrDisp()
-    pygame.display.flip()
-    time.sleep(10)
+    #start loc needs fixed
+    loc_int = []
+    loc = []
+    loc_int.append(location_conv(getMAC())) #start locations
+    loc.append(location_conv(getMAC())) 
+    i=0
     
+    #main loop
+    for k in range(0,10,1):
+        locationInput(loc,loc_int,i)
+        time.sleep(1)
+        i+=1
 
-    
-
+if __name__ == '__main__':
+    main()
