@@ -28,7 +28,7 @@ selB.pull = digitalio.Pull.UP
 
 #display drivers
 os.environ["SDL_FBDEV"] = "/dev/fb1"
-os.environ['SDL_VIDEODRIVER']="fbcon"
+#os.environ['SDL_VIDEODRIVER']="fbcon" #error with current config
 
 def killPid():
     import subprocess
@@ -140,63 +140,68 @@ def displaytext(text,size,line,color,clearscreen):
 
 def locationInput(loc,loc_int,i):
     loc_int.append(location_conv(getMAC()))
-    """#TEST FUNCTION
-    if i == 4:
-        loc_int[i] = 'East '
-    """
-    if loc_int[i] != loc_int[i-1]:
-        loc.append(loc_int[i])
-        if loc[-1] == 'User Travelling':
-            z=1
-        else:
-            killPid()
-            displaytext("Like to know more",20,3,(255,255,255),True)
-            displaytext("about this location?",20,2,(255,255,255),False)
-            displaytext("START (Y) / SEL (N)",20,1,(255,255,255),False)
-            pygame.display.flip()
-            
-            strt = startB.value
-            sel = selB.value
-            while True == (sel or strt):
-                if startB.value:
-                    print("START, Printing QR")
-                    x=info_conv(loc[-1])
-                    qrGen(x)
-                    qrDisp()
-                    pygame.display.flip()
-                    time.sleep(10)
-                    load=True
-                    break
-                    
-                elif selB.value:
-                    print("SEL")
-                    load=True
-                    break
-                else: 
-                    time.sleep(2)
-                    print("Waiting")
-                    
-    else:
-        load = False
-        openPID()
-        print("Same Location")
     
-    #Loading screen
-    if load:
-        loading="Loading"
-        for p in range(3):
-            loading=loading+"."
-            displaytext(loading,30,2,(100,100,255),True)
-            pygame.display.flip()
-            time.sleep(0.5)
+    with open("loc_int.txt", "a") as locSave:
+         locSave.write(loc_int[-1]+"\n")
+
+    strInt=''.join(loc_int[-1])
+    strIntPre=''.join(loc_int[i-1])
+    strLoc=''.join(loc[-1])
+
+    if i > 0:
+        if strInt != strIntPre:
+            loc.append(strInt)
+            if strLoc == 'User Travelling':
+                z=1
+            else:
+                 killPid()
+                 displaytext("Like to know more",20,3,(255,255,255),True)
+                 displaytext("about this location?",20,2,(255,255,255),False)
+                 displaytext("START (Y) / SEL (N)",20,1,(255,255,255),False)
+                 pygame.display.flip()
+            
+                 strt = startB.value
+                 sel = selB.value
+                 while True == (sel or strt):
+                     if startB.value:
+                        print("START, Printing QR")
+                        x=info_conv(strLoc)
+                        qrGen(x)
+                        qrDisp()
+                        pygame.display.flip()
+                        time.sleep(10)
+                        load=True
+                        break
+                        
+                     elif selB.value:
+                        print("SEL")
+                        load=True
+                        break
+                     else: 
+                        time.sleep(2)
+                        print("Waiting")
+                    
+        else:
+            load = False
+            openPID()
+            print("Same Location")
+        
+        #Loading screen
+        if load:
+            loading="Loading"
+            for p in range(3):
+                loading=loading+"."
+                displaytext(loading,30,2,(100,100,255),True)
+                pygame.display.flip()
+                time.sleep(0.5)
     
     #text file save + self test
     if path.exists("C://Users/Arric/Documents/test_loc.txt") == True:
         with open("C://Users/Arric/Documents/test_loc.txt", "a") as locSave:
-            locSave.write(loc[-1])
+            locSave.write(strLoc+"\n")
     else:
          with open("loc.txt", "a") as locSave:
-             locSave.write(loc[-1])
+             locSave.write(strLoc+"\n")
     #temp = CPUtemp() #optional CPU temp
     #usage = CPUuse() #CPU usage
     #ram = freeRAM() #RAM usage
@@ -205,22 +210,31 @@ def main():
     global screen
     print("Succesfully loaded script")
     pygame.init()
-    pygame.mouse.set_cursor((8,8),(0,0),(0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0)) #hides cursor
     size = width,height = 128,160
     screen = pygame.display.set_mode(size)
-    ts=te=time.perf_counter()
+    pygame.mouse.set_cursor((8,8),(0,0),(0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0)) #hides cursor
     
     loc_int = []
     loc = []
-    loc_int.append(location_conv(getMAC())) #start locations
-    loc.append(location_conv(getMAC())) 
-    i=0
-    
-    while (te-ts)<14400: #4h run time
-        locationInput(loc,loc_int,i)
-        i+=1
-        te=time.perf_counter()
-        time.sleep(600)
+    if path.exists("loc_int.txt") == True:
+        with open('loc_int.txt') as f:
+            for line in f:
+                inner = [elt.strip() for elt in line.split(',')]
+                loc_int.append(inner)
+                
+        if path.exists("loc.txt") == True:
+            with open('loc.txt') as f:
+                for line in f:
+                    inner = [elt.strip() for elt in line.split(',')]
+                    loc.append(inner)
+        i=len(loc_int)
+    else:
+        print("start detected")
+        i=0
+        loc_int.append(location_conv(getMAC())) #start locations
+        loc.append(location_conv(getMAC())) 
+        
+    locationInput(loc,loc_int,i)
 
 if __name__ == '__main__':
     main()
