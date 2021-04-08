@@ -157,7 +157,7 @@ def locationInput(loc,loc_int,i):
             
             strt = startB.value
             sel = selB.value
-            while True =(sel or strt):
+            while True == (sel or strt):
                 if startB.value:
                     print("START, Printing QR")
                     x=info_conv(loc[-1])
@@ -203,23 +203,24 @@ def locationInput(loc,loc_int,i):
 
 def main():
     global screen
+    print("Succesfully loaded script")
     pygame.init()
     pygame.mouse.set_cursor((8,8),(0,0),(0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0)) #hides cursor
     size = width,height = 128,160
     screen = pygame.display.set_mode(size)
+    ts=te=time.perf_counter()
     
-    #start loc needs fixed
     loc_int = []
     loc = []
     loc_int.append(location_conv(getMAC())) #start locations
     loc.append(location_conv(getMAC())) 
     i=0
     
-    #main loop
-    for k in range(0,10,1):
+    while (te-ts)<14400: #4h run time
         locationInput(loc,loc_int,i)
-        time.sleep(1)
         i+=1
+        te=time.perf_counter()
+        time.sleep(600)
 
 if __name__ == '__main__':
     main()
