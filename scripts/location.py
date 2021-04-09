@@ -13,7 +13,6 @@ from getmac import get_mac_address as gmc
 import netifaces as nf
 import time
 import qrcode
-import pygame
 from PIL import Image
 import board #Adafruit Blinka
 import digitalio #RPi GPIO
@@ -28,9 +27,22 @@ selB.pull = digitalio.Pull.UP
 
 #display drivers
 os.environ["SDL_FBDEV"] = "/dev/fb1"
-#os.environ['SDL_VIDEODRIVER']="fbcon" #error with current config
+os.environ['SDL_VIDEODRIVER']="fbcon" #error with current config
 
-def killPid():
+def killPid(pid):
+    if pid=='None':
+        print("fbcp not running!")
+    else:
+        os.kill(pid, 9)
+
+def openPID(pid):
+    if pid!='None':
+        print("fbcp already running!")
+    else: 
+        import subprocess
+        subprocess.Popen([r'fbcp'])
+    
+def checkPID():
     import subprocess
     subprocess = subprocess.Popen(['ps', '-A'], stdout=subprocess.PIPE)
     output, error = subprocess.communicate()
@@ -39,11 +51,10 @@ def killPid():
     for line in output.splitlines():
         if target_process in str(line):
             pid = int(line.split(None, 1)[0])
-            os.kill(pid, 9)
-
-def openPID():
-    import subprocess
-    subprocess.Popen([r'fbcp'])
+            break
+        else:
+            pid='None'        
+    return pid
 
 def info_conv(place):
     information = {
@@ -109,15 +120,24 @@ def qrGen(data):
     qr.add_data(data) #Configurable QR text
     qr.make(fit=True)
     img = qr.make_image(fill='black', back_color='white')
-    img.save('qr.png')
-    im = Image.open('qr.png')
+    img.save('qr.bmp')
+    im = Image.open('qr.bmp')
     im_resized=im.resize((128,160)) #resize to display
-    im_resized.save('qr.png') 
+    im_resized.save('qr.bmp') 
 
 def qrDisp():
-    qrCode = pygame.image.load('qr.png')
+    qrCode = pygame.image.load('qr.bmp')
     screen.fill((0,0,0))
     screen.blit(qrCode, (0,0))
+    
+def pygameInit(): #efficient init
+    global pygame
+    import pygame
+    global screen
+    pygame.init()
+    size = width,height = 128,160
+    screen = pygame.display.set_mode(size)
+    pygame.mouse.set_cursor((8,8),(0,0),(0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0))
     
 def displaytext(text,size,line,color,clearscreen):
    if clearscreen:
@@ -125,36 +145,42 @@ def displaytext(text,size,line,color,clearscreen):
 
    font = pygame.font.Font(None,size)
    text = font.render(text,0,color)
-   rotated = pygame.transform.rotate(text,90)
+   rotated = pygame.transform.rotate(text,270)
    textpos = rotated.get_rect()
    textpos.centery = 80
-   if line == 1:
+   if line == 3:
         textpos.centerx = 99
         screen.blit(rotated,textpos)
    elif line == 2:
-        textpos.centerx = 61
+        textpos.centerx = 72
         screen.blit(rotated,textpos)
-   elif line == 3:
-        textpos.centerx = 40
+   elif line == 1:
+        textpos.centerx = 20
         screen.blit(rotated,textpos)
 
 def locationInput(loc,loc_int,i):
     loc_int.append(location_conv(getMAC()))
-    
-    with open("loc_int.txt", "a") as locSave:
+    """
+    if i==3: #test
+        loc_int[-1]='East '
+        print("i=3 test")
+    """
+    with open("loc_int.txt", "a") as locSave: #write new value
          locSave.write(loc_int[-1]+"\n")
 
+    #create str from list
     strInt=''.join(loc_int[-1])
     strIntPre=''.join(loc_int[i-1])
     strLoc=''.join(loc[-1])
 
-    if i > 0:
+    if i > 0: #avoids start run
         if strInt != strIntPre:
             loc.append(strInt)
             if strLoc == 'User Travelling':
-                z=1
+                z=1 #do nothing
             else:
-                 killPid()
+                 killPid(checkPID())
+                 pygameInit()
                  displaytext("Like to know more",20,3,(255,255,255),True)
                  displaytext("about this location?",20,2,(255,255,255),False)
                  displaytext("START (Y) / SEL (N)",20,1,(255,255,255),False)
@@ -163,8 +189,8 @@ def locationInput(loc,loc_int,i):
                  strt = startB.value
                  sel = selB.value
                  while True == (sel or strt):
-                     if startB.value:
-                        print("START, Printing QR")
+                     if not(startB.value):
+                        print("START: Printing QR")
                         x=info_conv(strLoc)
                         qrGen(x)
                         qrDisp()
@@ -173,17 +199,16 @@ def locationInput(loc,loc_int,i):
                         load=True
                         break
                         
-                     elif selB.value:
+                     elif not(selB.value):
                         print("SEL")
                         load=True
                         break
                      else: 
-                        time.sleep(2)
+                        time.sleep(2) #update for button
                         print("Waiting")
                     
         else:
             load = False
-            openPID()
             print("Same Location")
         
         #Loading screen
@@ -194,7 +219,8 @@ def locationInput(loc,loc_int,i):
                 displaytext(loading,30,2,(100,100,255),True)
                 pygame.display.flip()
                 time.sleep(0.5)
-    
+    openPID(checkPID())
+         
     #text file save + self test
     if path.exists("C://Users/Arric/Documents/test_loc.txt") == True:
         with open("C://Users/Arric/Documents/test_loc.txt", "a") as locSave:
@@ -207,15 +233,10 @@ def locationInput(loc,loc_int,i):
     #ram = freeRAM() #RAM usage
 
 def main():
-    global screen
     print("Succesfully loaded script")
-    pygame.init()
-    size = width,height = 128,160
-    screen = pygame.display.set_mode(size)
-    pygame.mouse.set_cursor((8,8),(0,0),(0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0)) #hides cursor
-    
     loc_int = []
     loc = []
+    
     if path.exists("loc_int.txt") == True:
         with open('loc_int.txt') as f:
             for line in f:
@@ -229,7 +250,7 @@ def main():
                     loc.append(inner)
         i=len(loc_int)
     else:
-        print("start detected")
+        print("Start Detected")
         i=0
         loc_int.append(location_conv(getMAC())) #start locations
         loc.append(location_conv(getMAC())) 
