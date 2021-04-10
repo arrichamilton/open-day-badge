@@ -90,7 +90,7 @@ while(START==True):
     screen.blit(bg, (80,125))
     pygame.display.flip()
     time.sleep(0.5)
-    if not(i%5): #30s
+    if not(i%5): #5s
         killPID(checkPID())
     i+=1
     if startB.value==False:
