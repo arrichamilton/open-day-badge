@@ -158,13 +158,9 @@ def displaytext(text,size,line,color,clearscreen):
         textpos.centerx = 20
         screen.blit(rotated,textpos)
 
-def locationInput(loc,loc_int,i):
+def locationInput(loc,loc_int,i,pidFlag):
     loc_int.append(location_conv(getMAC()))
-    """
-    if i==3: #test
-        loc_int[-1]='East '
-        print("i=3 test")
-    """
+
     with open("/home/pi/scripts/loc_int.txt", "a") as locSave: #write new value
          locSave.write(loc_int[-1]+"\n")
 
@@ -179,16 +175,17 @@ def locationInput(loc,loc_int,i):
             if strLoc == 'User Travelling':
                 z=1 #do nothing
             else:
-                 killPID(checkPID())
-                 pygameInit()
-                 displaytext("Like to know more",20,3,(255,255,255),True)
-                 displaytext("about this location?",20,2,(255,255,255),False)
-                 displaytext("START (Y) / SEL (N)",20,1,(255,255,255),False)
-                 pygame.display.flip()
+                if pidFlag==True:
+                    killPID(checkPID())
+                pygameInit()
+                displaytext("Like to know more",20,3,(255,255,255),True)
+                displaytext("about this location?",20,2,(255,255,255),False)
+                displaytext("START (Y) / SEL (N)",20,1,(255,255,255),False)
+                pygame.display.flip()
             
-                 strt = startB.value
-                 sel = selB.value
-                 while True == (sel or strt):
+                strt = startB.value
+                sel = selB.value
+                while True == (sel or strt):
                      if not(startB.value):
                         print("START: Printing QR")
                         x=info_conv(strLoc)
@@ -219,7 +216,9 @@ def locationInput(loc,loc_int,i):
                 displaytext(loading,30,2,(100,100,255),True)
                 pygame.display.flip()
                 time.sleep(0.5)
-    openPID(checkPID())
+                
+    if pidFlag==True:    
+        openPID(checkPID())
          
     #text file save + self test
     if path.exists("C://Users/Arric/Documents/test_loc.txt") == True:
@@ -234,6 +233,11 @@ def locationInput(loc,loc_int,i):
 
 def main():
     print("Succesfully loaded script")
+    if checkPID()=='None':
+        pidFlag=False
+    else:
+        pidFlag=True
+        
     loc_int = []
     loc = []
     
@@ -255,7 +259,7 @@ def main():
         loc_int.append(location_conv(getMAC())) #start locations
         loc.append(location_conv(getMAC())) 
         
-    locationInput(loc,loc_int,i)
+    locationInput(loc,loc_int,i,pidFlag)
 
 if __name__ == '__main__':
     main()
