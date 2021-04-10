@@ -5,11 +5,13 @@ Retropie configuration files for ST7735R
 Further testing REQUIRED to ensure complete functionality. 
 
 # Scripts
+- name.py - Prints username to screen, acts as boot logo
 - location.py - The main script, combines all others
 - get_mac.py - converts gateway IP to determine MAC address
 - location_dict.py - matches MAC to building location
 - pid_kill.py - kills a PID on the RPi
 - qr_gen.py - generates, resizes, and outputs a QR image
+- image_disp.py - display a test image using pygame
 
 # Config/Boot Files
 - config.txt - boot config file for retropie /boot/config.txt

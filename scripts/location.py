@@ -29,7 +29,7 @@ selB.pull = digitalio.Pull.UP
 os.environ["SDL_FBDEV"] = "/dev/fb1"
 os.environ['SDL_VIDEODRIVER']="fbcon" #error with current config
 
-def killPid(pid):
+def killPID(pid):
     if pid=='None':
         print("fbcp not running!")
     else:
@@ -120,13 +120,13 @@ def qrGen(data):
     qr.add_data(data) #Configurable QR text
     qr.make(fit=True)
     img = qr.make_image(fill='black', back_color='white')
-    img.save('qr.bmp')
-    im = Image.open('qr.bmp')
+    img.save('/home/pi/scripts/qr.bmp')
+    im = Image.open('/home/pi/scripts/qr.bmp')
     im_resized=im.resize((128,160)) #resize to display
-    im_resized.save('qr.bmp') 
+    im_resized.save('/home/pi/scripts/qr.bmp') 
 
 def qrDisp():
-    qrCode = pygame.image.load('qr.bmp')
+    qrCode = pygame.image.load('/home/pi/scripts/qr.bmp')
     screen.fill((0,0,0))
     screen.blit(qrCode, (0,0))
     
@@ -165,7 +165,7 @@ def locationInput(loc,loc_int,i):
         loc_int[-1]='East '
         print("i=3 test")
     """
-    with open("loc_int.txt", "a") as locSave: #write new value
+    with open("/home/pi/scripts/loc_int.txt", "a") as locSave: #write new value
          locSave.write(loc_int[-1]+"\n")
 
     #create str from list
@@ -179,7 +179,7 @@ def locationInput(loc,loc_int,i):
             if strLoc == 'User Travelling':
                 z=1 #do nothing
             else:
-                 killPid(checkPID())
+                 killPID(checkPID())
                  pygameInit()
                  displaytext("Like to know more",20,3,(255,255,255),True)
                  displaytext("about this location?",20,2,(255,255,255),False)
@@ -226,7 +226,7 @@ def locationInput(loc,loc_int,i):
         with open("C://Users/Arric/Documents/test_loc.txt", "a") as locSave:
             locSave.write(strLoc+"\n")
     else:
-         with open("loc.txt", "a") as locSave:
+         with open("/home/pi/scripts/loc.txt", "a") as locSave:
              locSave.write(strLoc+"\n")
     #temp = CPUtemp() #optional CPU temp
     #usage = CPUuse() #CPU usage
@@ -237,14 +237,14 @@ def main():
     loc_int = []
     loc = []
     
-    if path.exists("loc_int.txt") == True:
-        with open('loc_int.txt') as f:
+    if path.exists("/home/pi/scripts/loc_int.txt") == True:
+        with open('/home/pi/scripts/loc_int.txt') as f:
             for line in f:
                 inner = [elt.strip() for elt in line.split(',')]
                 loc_int.append(inner)
                 
-        if path.exists("loc.txt") == True:
-            with open('loc.txt') as f:
+        if path.exists("/home/pi/scripts/loc.txt") == True:
+            with open('/home/pi/scripts/loc.txt') as f:
                 for line in f:
                     inner = [elt.strip() for elt in line.split(',')]
                     loc.append(inner)
