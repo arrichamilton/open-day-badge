@@ -94,6 +94,7 @@ for o in range(2):
 
 i=0
 global nameletter = 26
+global namecomplete = 0
 START=startB.value
 while(START==True):
     username="A"
@@ -108,8 +109,12 @@ while(START==True):
     if rightB.value==False:
 	username = username + str(ord((nameletter%26)-96))
 	nameletter = 26
-
-    displayText(username+str(ord((nameletter%26)-96)),50,1,(255,255,255),True)
+    if leftB.value==False:
+	namecomplete = 1
+    if namecomplete = 0:
+    	displayText(username+str(ord((nameletter%26)-96)),50,1,(255,255,255),True)
+    else:
+	displayText(username,50,1,(255,255,255),True)
     displayText("Press START to exit",15,2,(255,255,255),False)
     screen.blit(bg, (80,125))
     pygame.display.flip()
