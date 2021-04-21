@@ -10,10 +10,10 @@ import time
 
 #GPIO setup 
 startB = digitalio.DigitalInOut(board.D5) #START button
-leftB = digitalio.DigitalInOut(board.D4) #LEFT button
-rightB = digitalio.DigitalInOut(board.D3) #RIGHT button
-upB = digitalio.DigitalInOut(board.D2) #UP button
-downB = digitalio.DigitalInOut(board.D1) #DOWN button
+leftB = digitalio.DigitalInOut(board.D5) #LEFT button
+rightB = digitalio.DigitalInOut(board.D5) #RIGHT button
+upB = digitalio.DigitalInOut(board.D5) #UP button
+downB = digitalio.DigitalInOut(board.D5) #DOWN button
 
 startB.direction = digitalio.Direction.INPUT
 startB.pull = digitalio.Pull.UP
@@ -99,8 +99,12 @@ while(START==True):
     username="A"
     if downB.value==False:
 	nameletter += 1
+	if nameletter>52
+	    nameletter = 26
     if upB.value==False:
 	nameletter -= 1
+	if nameletter<26
+	    nameletter = 52
     if rightB.value==False:
 	username = username + str(ord((nameletter%26)-96))
 	nameletter = 26
