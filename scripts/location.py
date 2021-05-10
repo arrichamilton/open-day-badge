@@ -4,7 +4,8 @@ Created on Thu Apr  1 00:27:55 2021
 @author: TDP4 Team 3 2021
 To-Do List:
     1) Process check against emulation station
-    2) Change timings for QR Display
+    2) Change timings for QR Display 
+    3) Capitalize MAC addresses
 """
 import os
 from os import path
@@ -136,9 +137,9 @@ def getMAC():
             cell[kmac].q = text[i].split('Quality=')[1].split(' Signal')[0]
             kmac += 1
 
-    for i in range(cell_count):
+    """for i in range(cell_count): #troubleshooting ONLY
         print(cell[i].addr)
-        print(cell[i].q)
+        print(cell[i].q)"""
 
     best_cell_no = 0
     cellBest = cell[0].q
