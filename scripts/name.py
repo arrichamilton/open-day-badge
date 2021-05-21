@@ -58,7 +58,7 @@ def displayText(text,size,line,color,clearscreen):
         textpos.centerx = 20
         screen.blit(rotated,textpos)
    elif line == 1:
-        textpos.centerx = 80
+        textpos.centerx = 65
         screen.blit(rotated,textpos)
    elif line == 3:
         textpos.centerx = 72
@@ -84,7 +84,7 @@ for o in range(2):
 i=0
 START=startB.value
 while(START==True):
-    username="Arric"
+    username="Team 3"
     displayText(username,50,1,(255,255,255),True)
     displayText("Press START to exit",15,2,(255,255,255),False)
     screen.blit(bg, (80,125))

@@ -2,10 +2,6 @@
 """
 Created on Thu Apr  1 00:27:55 2021
 @author: TDP4 Team 3 2021
-To-Do List:
-    1) Process check against emulation station
-    2) Change timings for QR Display 
-    3) Capitalize MAC addresses
 """
 import os
 from os import path
@@ -62,31 +58,29 @@ def checkPID():
 
 def info_conv(place):
     information = {
-        'Rankine ': 'https://universitystory.gla.ac.uk/building/?id=18 ',
-        'Library ': 'https://universitystory.gla.ac.uk/building/?id=69 ',
-        'James Watt School of Engineering ': 'https://universitystory.gla.ac.uk/building/?id=112',
-        'Glasgow University Union ': 'https://universitystory.gla.ac.uk/building/?id=50',
-        'Fraser Building ': 'https://universitystory.gla.ac.uk/building/?id=71',
-        'Boyd Orr ': 'https://universitystory.gla.ac.uk/building/?id=40',
-        'Queen Margaret Union ': 'https://universitystory.gla.ac.uk/building/?id=19',
-        'East ': 'https://en.wikipedia.org/wiki/University_of_Glasgow',
-        'West ': 'https://en.wikipedia.org/wiki/University_of_Glasgow',
-        'Self Test ': 'Self Test',
+        'Rankine ': 'r ',
+        'Library ': 'l',
+        'James Watt School of Engineering ': 'j',
+        'Glasgow University Union ': 'g',
+        'Fraser Building ': 'f',
+        'Boyd Orr ': 'b',
+        'Queen Margaret Union ': 'q',
+        'Self Test ': 's',
     }
     return information.get(place, 'None')
 
 def location_conv(name):
     address = {
-        '00:2a:10:57:35:31': 'Rankine ',
-        '00:2a:10:9b:8a:b1': 'Library ',
-        'f8:4f:57:3a:21:11': 'James Watt School of Engineering ',
-        'd4:6d:50:f3:11:21': 'Glasgow University Union ',
-        '84:78:ac:f0:22:a1': 'Fraser Building ',
-        'ec:e1:a9:6e:be:81': 'Boyd Orr ',
-        '00:2a:10:93:bf:f1': 'Queen Margaret Union ',
-        '70:79:b3:2d:6f:a1': 'East ',
-        'b8:62:1f:ac:60:81': 'West ',
-        '80:72:15:EF:AA:22': 'Self Test'
+        '00:2A:10:57:35:31': 'Rankine ',
+        '00:2A:10:9B:8A:B1': 'Library ',
+        'F8:4F:57:3A:21:11': 'James Watt School of Engineering ',
+        'D4:6D:50:F3:11:21': 'Glasgow University Union ',
+        '84:78:AC:F0:22:A1': 'Fraser Building ',
+        'EC:E1:A9:6E:BE:81': 'Boyd Orr ',
+        '00:2A:10:93:BF:F1': 'Queen Margaret Union ',
+        #'70:79:B3:2D:6F:A1': 'East ',
+        #'B8:62:1F:AC:60:81': 'West ',
+        '80:72:15:EF:AA:21': 'Self Test'
     }
     return address.get(name, 'User Travelling ')
 
@@ -137,23 +131,20 @@ def getMAC():
             cell[kmac].q = text[i].split('Quality=')[1].split(' Signal')[0]
             kmac += 1
 
-    """for i in range(cell_count): #troubleshooting ONLY
-        print(cell[i].addr)
-        print(cell[i].q)"""
-
-    best_cell_no = 0
+    best_cell_num = 0
     cellBest = cell[0].q
     for i in range(cell_count):
         if cellBest < cell[i].q:
             cellBest = cell[i].q
-            best_cell_no = i
-    mac = cell[best_cell_no].addr
+            best_cell_num = i
+    mac = cell[best_cell_num].addr
     print("Best quality:", mac)
     return mac
 
 def qrGen(data):
+    x = "https://prospectusgla.000webhostapp.com/?buildings=" + data
     qr = qrcode.QRCode(version=1, box_size=10, border=5)  # QR class
-    qr.add_data(data)  # Configurable QR text
+    qr.add_data(x)  # Configurable QR text
     qr.make(fit=True)
     img = qr.make_image(fill='black', back_color='white')
     img.save('/home/pi/scripts/qr.bmp')
@@ -209,60 +200,85 @@ def locationInput(loc, loc_int, i, pidFlag):
         if strInt != strIntPre:
             loc.append(strInt)
             if strLoc == 'User Travelling':
-                z = 1  # do nothing
-            else:
-                if pidFlag == True:
-                    killPID(checkPID())
-                pygameInit()
-                displaytext("Like to know more", 20, 3, (255, 255, 255), True)
-                displaytext("about this location?", 20, 2, (255, 255, 255), False)
-                displaytext("START (Y) / SEL (N)", 20, 1, (255, 255, 255), False)
-                pygame.display.flip()
-
-                strt = startB.value
-                sel = selB.value
-                while True == (sel or strt):
-                    if not (startB.value):
-                        print("START: Printing QR")
-                        x = info_conv(strLoc)
-                        qrGen(x)
-                        qrDisp()
-                        pygame.display.flip()
-                        time.sleep(10)
-                        load = 1
-                        break
-
-                    elif not (selB.value):
-                        print("SEL")
-                        load = 1
-                        break
-                    else:
-                        time.sleep(2)  # update for button
-                        print("Waiting")
-
+                z = 1  #do nothing
         else:
-            load = 0
             print("Same Location")
+            
+        if i > 120:
+            if pidFlag == True:
+                #additional GPIO setup
+                aB = digitalio.DigitalInOut(board.D22) #A button
+                aB.direction = digitalio.Direction.INPUT
+                aB.pull = digitalio.Pull.UP
+                rightB = digitalio.DigitalInOut(board.D15) #RIGHT button
+                rightB.direction = digitalio.Direction.INPUT
+                rightB.pull = digitalio.Pull.UP
+                upB = digitalio.DigitalInOut(board.D14) #UP button
+                upB.direction = digitalio.Direction.INPUT
+                upB.pull = digitalio.Pull.UP
+                downB = digitalio.DigitalInOut(board.D18) #DOWN button
+                downB.direction = digitalio.Direction.INPUT
+                downB.pull = digitalio.Pull.UP
+                
+                strt=startB.value
+                sel=selB.value
+                a=aB.value
+                r=rightB.value
+                up=upB.value
+                down=downB.value
+                
+                bcounter=0
+                
+                while True == (sel or strt or a or r or up or down):
+                    if not(startB.value or selB.value or aB.value or rightB.value or upB.value or downB.value):
+                        print("button detected")
+                    else:
+                        bcounter+=1
+                    time.sleep(1)
+                    
+                    if bcounter==30:
+                        killPID(checkPID())
+                        break
+                
+            pygameInit()
+            displaytext("Like to know more", 20, 3, (255, 255, 255), True)
+            displaytext("about your visits?", 20, 2, (255, 255, 255), False)
+            displaytext("START (Y) / SEL (N)", 20, 1, (255, 255, 255), False)
+            pygame.display.flip()
 
-        # Loading screen
-        if load:
-            loading = "Loading"
-            for p in range(3):
-                loading = loading + "."
-                displaytext(loading, 30, 2, (100, 100, 255), True)
-                pygame.display.flip()
-                time.sleep(0.5)
+            strt = startB.value
+            sel = selB.value
+            while True == (sel or strt):
+                if not (startB.value):
+                    print("START: Printing QR")
+                    
+                    strQR=[]
+                    for i in range(len(loc)):
+                        strQR.append(''.join(info_conv(loc[i])))
+                    
+                    data=[]
+                    for i in range(len(loc)):
+                        data = data+strQR[i]
+                        
+                    qrGen(data)
+                    qrDisp()
+                    pygame.display.flip()
+                    time.sleep(45)
+                    break
 
-    if pidFlag == True:
-        openPID(checkPID())
+                elif not (selB.value):
+                    print("SEL: Not Printing QR")
+                    if pidFlag == True:
+                        openPID(checkPID())
+                    break
+                else:
+                    time.sleep(1)  # update for button
+                    print("Waiting")
 
-    # text file save + self test
-    if path.exists("C://Users/Arric/Documents/test_loc.txt") == True:
-        with open("C://Users/Arric/Documents/test_loc.txt", "a") as locSave:
-            locSave.write(strLoc + "\n")
-    else:
-        with open("/home/pi/scripts/loc.txt", "a") as locSave:
-            locSave.write(strLoc + "\n")
+    # text file save 
+    with open("/home/pi/scripts/loc.txt", "a") as locSave:
+        locSave.write(strLoc + "\n")
+        
     # temp = CPUtemp() #optional CPU temp
     # usage = CPUuse() #CPU usage
     # ram = freeRAM() #RAM usage
@@ -292,7 +308,7 @@ def main():
     else:
         print("Start Detected")
         i = 0
-        loc_int.append(location_conv(getMAC()))  # start locations
+        loc_int.append(location_conv(getMAC())) # start locations
         loc.append(location_conv(getMAC()))
 
     locationInput(loc, loc_int, i, pidFlag)
