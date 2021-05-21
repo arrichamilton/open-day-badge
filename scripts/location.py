@@ -65,7 +65,6 @@ def info_conv(place):
         'Fraser Building ': 'f',
         'Boyd Orr ': 'b',
         'Queen Margaret Union ': 'q',
-        'Self Test ': 's',
     }
     return information.get(place, 'None')
 
@@ -80,7 +79,6 @@ def location_conv(name):
         '00:2A:10:93:BF:F1': 'Queen Margaret Union ',
         #'70:79:B3:2D:6F:A1': 'East ',
         #'B8:62:1F:AC:60:81': 'West ',
-        '80:72:15:EF:AA:21': 'Self Test'
     }
     return address.get(name, 'User Travelling ')
 
@@ -253,17 +251,19 @@ def locationInput(loc, loc_int, i, pidFlag):
                     print("START: Printing QR")
                     
                     strQR=[]
+                    data=""
                     for i in range(len(loc)):
-                        strQR.append(''.join(info_conv(loc[i])))
-                    
-                    data=[]
-                    for i in range(len(loc)):
-                        data = data+strQR[i]
+                        strQR.append(info_conv(''.join(loc[i])))
+                        data = data+strQR[i]   
                         
                     qrGen(data)
                     qrDisp()
                     pygame.display.flip()
-                    time.sleep(45)
+                    strt = startB.value
+                    while True == strt:
+                        print("waiting for strt")
+                        if not (startB.value):
+                            break
                     break
 
                 elif not (selB.value):
@@ -275,9 +275,13 @@ def locationInput(loc, loc_int, i, pidFlag):
                     time.sleep(1)  # update for button
                     print("Waiting")
 
-    # text file save 
-    with open("/home/pi/scripts/loc.txt", "a") as locSave:
-        locSave.write(strLoc + "\n")
+            # text file save 
+            with open("/home/pi/scripts/loc.txt", "a") as locSave:
+                locSave.write(strLoc + "\n")
+            
+    if i == 0:
+        with open("/home/pi/scripts/loc.txt", "a") as locSave:
+            locSave.write(strLoc + "\n")
         
     # temp = CPUtemp() #optional CPU temp
     # usage = CPUuse() #CPU usage
@@ -306,7 +310,7 @@ def main():
                     loc.append(inner)
         i = len(loc_int)
     else:
-        print("Start Detected")
+        print("Initial Run")
         i = 0
         loc_int.append(location_conv(getMAC())) # start locations
         loc.append(location_conv(getMAC()))
