@@ -10,11 +10,6 @@ import board #Adafruit Blinka
 import digitalio #RPi GPIO
 import time
 
-#GPIO setup 
-startB = digitalio.DigitalInOut(board.D5) #START button
-startB.direction = digitalio.Direction.INPUT
-startB.pull = digitalio.Pull.UP
-
 os.environ["SDL_FBDEV"] = "/dev/fb1"
 os.environ['SDL_VIDEODRIVER']="fbcon"
 
@@ -64,7 +59,11 @@ def displayText(text,size,line,color,clearscreen):
         textpos.centerx = 72
         screen.blit(rotated,textpos)
     
-global screen
+global screen 
+yB= digitalio.DigitalInOut(board.D26) #Y button
+yB.direction = digitalio.Direction.INPUT
+yB.pull = digitalio.Pull.UP
+
 killPID(checkPID())
 pygame.init()
 size = width,height = 128,160
@@ -82,17 +81,17 @@ for o in range(2):
         time.sleep(0.5)
 
 i=0
-START=startB.value
-while(START==True):
+Y=yB.value
+while(Y==True):
     username="Team 3"
     displayText(username,50,1,(255,255,255),True)
-    displayText("Press START to exit",15,2,(255,255,255),False)
+    displayText("Press Y to exit",15,2,(255,255,255),False)
     screen.blit(bg, (80,125))
     pygame.display.flip()
     time.sleep(0.5)
     if not(i%5): #5s
         killPID(checkPID())
     i+=1
-    if startB.value==False:
+    if yB.value==False:
         openPID(checkPID())
         exit()

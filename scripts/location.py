@@ -230,6 +230,7 @@ def locationInput(loc, loc_int, i, pidFlag):
                 while True == (sel or strt or a or r or up or down):
                     if not(startB.value or selB.value or aB.value or rightB.value or upB.value or downB.value):
                         print("button detected")
+                        bcounter=0
                     else:
                         bcounter+=1
                     time.sleep(1)
