@@ -17,7 +17,6 @@ if [ "$_IP" ]; then
   printf "My IP address is %s\n" "$_IP"
 fi
 
-sudo retrogame&
 sudo python3 /home/pi/scripts/name.py&
 
 exit 0
