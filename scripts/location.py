@@ -22,7 +22,7 @@ selB.pull = digitalio.Pull.UP
 
 # display drivers
 os.environ["SDL_FBDEV"] = "/dev/fb1"
-os.environ['SDL_VIDEODRIVER'] = "fbcon"  # error with current config
+os.environ['SDL_VIDEODRIVER'] = "fbcon"  
 
 #RSSI config
 interface = 'wlan0'
