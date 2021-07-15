@@ -2,8 +2,8 @@
 
 Retropie configuration files for ST7735R
 
-
 Name script and location script need timing tuning - further testing REQUIRED to ensure complete functionality. 
+If you would like a copy of a Raspberry Pi Image (Pi Zero) that includes all the below scripts and bootfiles please message me: arric@arrichamilton.com
 
 # Scripts
 - name.py - Prints username to screen, acts as boot logo
