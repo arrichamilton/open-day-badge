@@ -2,7 +2,8 @@
 
 Retropie configuration files for ST7735R
 
-Further testing REQUIRED to ensure complete functionality. 
+
+Name script and location script need timing tuning - further testing REQUIRED to ensure complete functionality. 
 
 # Scripts
 - name.py - Prints username to screen, acts as boot logo
@@ -23,6 +24,5 @@ Further testing REQUIRED to ensure complete functionality.
 
 # Useful links:
 - PiShrink Image Resizer [github](https://github.com/Drewsif/PiShrink)
-- 128x160 GU Logo [imgur](https://i.imgur.com/65o2n7P.png)
 - Adafruit GPIO configs [github](https://github.com/adafruit/Adafruit-Retrogame)
 - Raspberry Pi GPIO Pins [raspberrypi](https://www.raspberrypi.org/documentation/usage/gpio/)
